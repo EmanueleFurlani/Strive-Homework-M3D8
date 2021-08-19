@@ -44,7 +44,8 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md-6">
-          <h2 class="mt-5 mb-3">Backoffice</h2>
+          <h2 class="d-inline-block mt-5 mb-3">Backoffice</h2>
+          <h5 id="subtitle" class="d-inline-block"></h5>
           <form onsubmit="handleSubmit(event)">
             <div class="form-group">
               <label for="name">Product Name</label>
@@ -96,13 +97,58 @@
                 required
               />
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">
+              <span>Submit</span>
+            </button>
           </form>
         </div>
       </div>
     </div>
 
     <script>
+      const prodId = new URLSearchParams(window.location.search).get("id");
+
+      const endpoint = prodId
+        ? "https://striveschool-api.herokuapp.com/api/product/" + prodId
+        : "https://striveschool-api.herokuapp.com/api/product/";
+      const method = prodId ? "PUT" : "POST";
+
+      window.onload = async () => {
+        console.log("Resource ID is: " + prodId);
+
+        if (prodId) {
+          document.getElementById("subtitle").innerText = " — Edit Product";
+          const submitBtn = document.querySelector("button[type=submit]");
+
+          submitBtn.querySelector("span").innerText = "Edit Product";
+          submitBtn.classList.remove("btn-primary");
+          submitBtn.classList.add("btn-success");
+
+          //document.getElementById("delete-btn").classList.remove("d-none");
+
+          const response = await fetch(endpoint, {
+            method,
+            body: JSON.stringify(),
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTFjZmM3YzJkNTI2MjAwMTViNmRjYWMiLCJpYXQiOjE2MjkyODk1OTYsImV4cCI6MTYzMDQ5OTE5Nn0.iDlMUTTc0xtrNaoAmVgV2jnkXWgsEQjde8S63n28N4U",
+              "Content-Type": "application/json",
+            },
+          });
+          const prodDetails = await response.json();
+          console.log(prodDetails);
+
+          document.getElementById("name").value = prodDetails.name;
+          document.getElementById("description").value =
+            prodDetails.description;
+          document.getElementById("brand").value = prodDetails.brand;
+          document.getElementById("price").value = prodDetails.price;
+          document.getElementById("imageUrl").value = prodDetails.imageUrl;
+        } else {
+          document.getElementById("subtitle").innerText = " — Create a Product";
+        }
+      };
+
       const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -116,18 +162,15 @@
 
         console.log(JSON.stringify(myProducts));
         try {
-          const response = await fetch(
-            "https://striveschool-api.herokuapp.com/api/product/",
-            {
-              method: "POST",
-              body: JSON.stringify(myProducts),
-              headers: {
-                Authorization:
-                  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTFjZmM3YzJkNTI2MjAwMTViNmRjYWMiLCJpYXQiOjE2MjkyODk1OTYsImV4cCI6MTYzMDQ5OTE5Nn0.iDlMUTTc0xtrNaoAmVgV2jnkXWgsEQjde8S63n28N4U",
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          const response = await fetch(endpoint, {
+            method,
+            body: JSON.stringify(myProducts),
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTFjZmM3YzJkNTI2MjAwMTViNmRjYWMiLCJpYXQiOjE2MjkyODk1OTYsImV4cCI6MTYzMDQ5OTE5Nn0.iDlMUTTc0xtrNaoAmVgV2jnkXWgsEQjde8S63n28N4U",
+              "Content-Type": "application/json",
+            },
+          });
           if (response.ok) {
             const respProduct = await response.json();
             alert(
