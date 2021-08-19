@@ -98,7 +98,7 @@
               />
             </div>
             <button type="submit" class="btn btn-primary">
-              <span>Submit</span>
+              <span>Create</span>
             </button>
           </form>
         </div>
@@ -176,6 +176,9 @@
             alert(
               "New product added successfully with an id of " + respProduct._id
             );
+            setTimeout(() => {
+              window.location.assign("/");
+            }, 4100);
           }
         } catch (err) {
           console.log(err);
